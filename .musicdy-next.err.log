@@ -1,0 +1,8 @@
+⨯ Another next dev server is already running.
+
+- Local:        http://localhost:3000
+- PID:          12552
+- Dir:          D:\@ s\mi_app_musical\mi_app_musical\musicdy_web
+- Log:          .next\dev\logs\next-development.log
+
+Run taskkill /PID 12552 /F to stop it.
