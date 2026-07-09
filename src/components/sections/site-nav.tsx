@@ -32,7 +32,7 @@ export function SiteNav() {
 
         <div className="flex items-center gap-4">
           <a
-            href="https://github.com"
+            href="https://github.com/lean-wav"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="GitHub"
@@ -41,7 +41,7 @@ export function SiteNav() {
             <GithubIcon className="h-5 w-5" />
           </a>
           <a
-            href="https://linkedin.com"
+            href="https://www.linkedin.com/in/leandro-cruces-59ab69257/"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="LinkedIn"

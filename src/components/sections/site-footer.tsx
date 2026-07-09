@@ -2,11 +2,7 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowUpRight, Mail } from "lucide-react";
-import {
-  GithubIcon,
-  InstagramIcon,
-  LinkedinIcon,
-} from "@/components/ui/brand-icons";
+import { GithubIcon, LinkedinIcon } from "@/components/ui/brand-icons";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -14,20 +10,14 @@ const socials = [
   {
     label: "GitHub",
     sub: "Ver mis repositorios",
-    href: "https://github.com",
+    href: "https://github.com/lean-wav",
     Icon: GithubIcon,
   },
   {
     label: "LinkedIn",
     sub: "Conectemos",
-    href: "https://linkedin.com",
+    href: "https://www.linkedin.com/in/leandro-cruces-59ab69257/",
     Icon: LinkedinIcon,
-  },
-  {
-    label: "Instagram",
-    sub: "Seguime",
-    href: "https://instagram.com",
-    Icon: InstagramIcon,
   },
   {
     label: "Correo",
@@ -98,7 +88,7 @@ export function SiteFooter() {
         {/* Tarjetas de redes */}
         <motion.div
           variants={item}
-          className="mt-20 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
+          className="mt-20 grid grid-cols-1 gap-4 sm:grid-cols-3"
         >
           {socials.map(({ label, sub, href, Icon }) => {
             const external = href.startsWith("http");
