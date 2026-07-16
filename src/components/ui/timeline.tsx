@@ -11,10 +11,12 @@ export const Timeline = ({
   data,
   title = "Trabajos que he realizado",
   description = "Una cronología de las páginas web y proyectos que he desarrollado.",
+  headerExtra,
 }: {
   data: TimelineEntry[];
   title?: string;
   description?: string;
+  headerExtra?: React.ReactNode;
 }) => {
   const ref = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState(0);
@@ -76,6 +78,7 @@ export const Timeline = ({
         <p className="mt-4 max-w-lg leading-relaxed text-neutral-400 text-sm md:text-base">
           {description}
         </p>
+        {headerExtra}
       </div>
 
       <div ref={ref} className="relative mx-auto max-w-7xl pb-20">
