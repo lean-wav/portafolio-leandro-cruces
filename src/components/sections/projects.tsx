@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 import { Clapperboard, ExternalLink, Globe, Play } from "lucide-react";
+import { InstagramIcon } from "@/components/ui/brand-icons";
 import { Timeline } from "@/components/ui/timeline";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
@@ -138,6 +139,16 @@ const videoclips: VideoProject[] = [
     tags: ["Edición", "Montaje", "Color"],
   },
 ];
+
+const musicdyContent = {
+  brand: "Musicdy",
+  handle: "@musicdy.app",
+  role: "Recién arrancando",
+  description:
+    "Todo el contenido de Musicdy lo hago yo: la edición creativa, el marketing y la publicación. La startup recién está arrancando con el contenido, así que estoy armando desde cero la identidad audiovisual de la marca.",
+  url: "https://www.instagram.com/musicdy.app/",
+  tags: ["Edición creativa", "Marketing", "Contenido", "Marca"],
+};
 
 function StatusPill({ status, tone }: { status: string; tone: Project["statusTone"] }) {
   if (tone === "amber") {
@@ -451,6 +462,63 @@ function VideoGrid({ videos }: { videos: VideoProject[] }) {
   );
 }
 
+function BrandContentCard() {
+  const c = musicdyContent;
+  return (
+    <Reveal>
+      <article className="group overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-900/40 transition-all duration-300 hover:border-neutral-600 lg:grid lg:grid-cols-[1.1fr_1fr]">
+        <a
+          href={c.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`Abrir el Instagram de ${c.brand}`}
+          className="relative flex aspect-video w-full items-center justify-center overflow-hidden border-b border-neutral-800/80 bg-neutral-950 lg:h-full lg:min-h-[360px] lg:border-b-0 lg:border-r"
+        >
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(251,191,36,0.12),transparent_65%)]" />
+          <div className="relative flex flex-col items-center gap-4">
+            <span className="flex size-16 items-center justify-center rounded-2xl border border-amber-400/30 bg-amber-400/10 text-amber-300 transition-transform duration-300 group-hover:scale-105">
+              <InstagramIcon className="h-7 w-7" />
+            </span>
+            <span className="font-heading text-xl font-bold text-white md:text-2xl">
+              {c.handle}
+            </span>
+            <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-neutral-500">
+              Contenido en construcción
+            </span>
+          </div>
+        </a>
+        <div className="flex flex-col justify-center gap-5 p-6 md:p-8">
+          <div className="flex items-center gap-3">
+            <h3 className="font-heading text-2xl font-bold text-white md:text-3xl">{c.brand}</h3>
+            <span className="shrink-0 rounded-full border border-amber-400/25 bg-amber-400/10 px-2.5 py-0.5 text-[10px] font-semibold text-amber-300">
+              {c.role}
+            </span>
+          </div>
+          <p className="text-sm leading-relaxed text-neutral-400 md:text-base">{c.description}</p>
+          <div className="flex flex-wrap gap-1.5">
+            {c.tags.map((tag) => (
+              <span
+                key={tag}
+                className="rounded-md bg-neutral-800 px-2 py-0.5 font-mono text-[10px] text-neutral-300"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+          <a
+            href={c.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-1 inline-flex w-fit items-center gap-2 rounded-full border border-neutral-700 px-5 py-2.5 font-heading text-xs font-semibold text-neutral-100 transition-all duration-300 hover:border-neutral-500 hover:text-white active:scale-[0.98]"
+          >
+            Ver en Instagram <ExternalLink className="h-3.5 w-3.5" />
+          </a>
+        </div>
+      </article>
+    </Reveal>
+  );
+}
+
 type Tab = "sitios" | "video";
 
 const tabs: { id: Tab; label: string; icon: React.ElementType }[] = [
@@ -503,6 +571,7 @@ export function Projects() {
   const videoData = [
     { title: "Destacado", content: <FeaturedVideoCard video={featuredVideo} /> },
     { title: "Videoclips", content: <VideoGrid videos={videoclips} /> },
+    { title: "Contenido de marca", content: <BrandContentCard /> },
   ];
 
   const isSitios = tab === "sitios";
@@ -515,7 +584,7 @@ export function Projects() {
         description={
           isSitios
             ? "Una cronología interactiva de los sitios que diseñé y desplegué a medida sobre la infraestructura de Vercel."
-            : "Videoclips musicales grabados junto a Zoe Navarro y editados por mí: montaje, ritmo de corte y corrección de color de cada tema."
+            : "Videoclips musicales grabados junto a Zoe Navarro y editados por mí, más todo el contenido audiovisual de Musicdy: edición creativa, marketing y marca."
         }
         headerExtra={<TabSwitch tab={tab} setTab={setTab} />}
       />
