@@ -20,6 +20,18 @@ type Project = {
   tags: string[];
 };
 
+const mindfulnessBA: Project = {
+  name: "Mindfulness Buenos Aires",
+  status: "Vendida y entregada",
+  statusTone: "amber",
+  description:
+    "Sitio institucional de la Lic. Lissy Szwarcberg, instructora MBSR certificada por el Global Mindfulness Collaborative (Brown University). Programas de 4 y 8 semanas, retiros, propuestas para empresas, testimonios y un reproductor de meditaciones guiadas. Entregado y en producción con dominio propio.",
+  url: "https://www.mindfulnessbuenosaires.com/",
+  cta: "Visitar sitio oficial",
+  image: "/mindfulness-real.png",
+  tags: ["Next.js", "Tailwind", "Lenis"],
+};
+
 const beylhe: Project = {
   name: "Beylhe",
   status: "Vendida y entregada",
@@ -563,7 +575,15 @@ export function Projects() {
   const [tab, setTab] = useState<Tab>("sitios");
 
   const sitiosData = [
-    { title: "Entregados", content: <FeaturedCard project={beylhe} /> },
+    {
+      title: "Entregados",
+      content: (
+        <div className="space-y-6">
+          <FeaturedCard project={mindfulnessBA} />
+          <FeaturedCard project={beylhe} />
+        </div>
+      ),
+    },
     { title: "En venta", content: <CardGrid projects={enVenta} /> },
     { title: "En producción", content: <CardGrid projects={enProduccion} /> },
   ];
