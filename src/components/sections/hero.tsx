@@ -4,11 +4,9 @@ import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { ArrowDown, ArrowUpRight } from "lucide-react";
 import { ShaderAnimation } from "@/components/ui/shader-lines";
 import { Typewriter } from "@/components/ui/typewriter";
+import { useLanguage } from "@/lib/i18n/language-provider";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
-
-const SUBTITLE =
-  "Soy Leandro Cruces, desarrollador full-stack. Construyo sitios en producción para clientes reales y estoy creando Musicdy, mi startup musical.";
 
 /** Revelado palabra por palabra: cada palabra sube desde abajo con máscara. */
 function WordsReveal({
@@ -42,6 +40,8 @@ function WordsReveal({
 
 export function Hero() {
   const reduce = useReducedMotion();
+  const { t } = useLanguage();
+  const subtitle = t.hero.subtitle;
 
   // Botones: contenedor que escalona la entrada de cada botón.
   const buttonsWrap: Variants = {
@@ -84,12 +84,12 @@ export function Hero() {
             animate={reduce ? { opacity: 1 } : { opacity: 1, filter: "blur(0px)", y: 0 }}
             transition={{ duration: 1, delay: 0.2, ease: EASE }}
           >
-            Webs y productos
+            {t.hero.line1}
           </motion.span>
 
           {/* Línea 2: revelado palabra por palabra */}
           <span className="block">
-            <WordsReveal text="digitales que se sienten" delay={0.7} />
+            <WordsReveal text={t.hero.line2} delay={0.7} />
           </span>
 
           {/* Línea 3: pop con resorte, en ámbar */}
@@ -103,7 +103,7 @@ export function Hero() {
                 : { type: "spring", stiffness: 210, damping: 12, delay: 1.25 }
             }
           >
-            premium.
+            {t.hero.line3}
           </motion.span>
         </h1>
 
@@ -118,10 +118,10 @@ export function Hero() {
             aria-hidden="true"
             className="invisible text-base leading-relaxed text-neutral-300 md:text-lg"
           >
-            {SUBTITLE}
+            {subtitle}
           </p>
           <p className="absolute inset-0 text-base leading-relaxed text-neutral-300 md:text-lg">
-            <Typewriter text={SUBTITLE} startDelay={reduce ? 0 : 1400} speed={15} />
+            <Typewriter key={subtitle} text={subtitle} startDelay={reduce ? 0 : 1400} speed={15} />
           </p>
         </motion.div>
 
@@ -137,14 +137,14 @@ export function Hero() {
             href="#proyectos"
             className="inline-flex items-center gap-2 rounded-full bg-amber-400 px-6 py-3 font-heading text-sm font-semibold text-neutral-950 transition-colors duration-300 hover:bg-amber-300 active:scale-[0.98]"
           >
-            Ver proyectos <ArrowDown className="h-4 w-4" />
+            {t.hero.ctaProjects} <ArrowDown className="h-4 w-4" />
           </motion.a>
           <motion.a
             variants={buttonItem}
             href="#musicdy"
             className="inline-flex items-center gap-2 rounded-full border border-neutral-600 bg-neutral-950/40 px-6 py-3 font-heading text-sm font-semibold text-neutral-200 backdrop-blur-sm transition-colors duration-300 hover:border-neutral-400 hover:text-white active:scale-[0.98]"
           >
-            Conocer Musicdy <ArrowUpRight className="h-4 w-4" />
+            {t.hero.ctaMusicdy} <ArrowUpRight className="h-4 w-4" />
           </motion.a>
         </motion.div>
       </div>

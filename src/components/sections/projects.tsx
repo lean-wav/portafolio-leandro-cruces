@@ -6,10 +6,15 @@ import { motion, useReducedMotion } from "framer-motion";
 import { Clapperboard, ExternalLink, Globe, Play } from "lucide-react";
 import { InstagramIcon } from "@/components/ui/brand-icons";
 import { Timeline } from "@/components/ui/timeline";
+import { useLanguage } from "@/lib/i18n/language-provider";
+import type { Dictionary } from "@/lib/i18n/dictionaries";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
+type ProjectId = "mindfulness" | "beylhe" | "asrey" | "esteko" | "enbox" | "crecer";
+
 type Project = {
+  id: ProjectId;
   name: string;
   status: string;
   statusTone: "amber" | "neutral";
@@ -20,81 +25,43 @@ type Project = {
   tags: string[];
 };
 
-const mindfulnessBA: Project = {
-  name: "Mindfulness Buenos Aires",
-  status: "Vendida y entregada",
-  statusTone: "amber",
-  description:
-    "Sitio institucional de la Lic. Lissy Szwarcberg, instructora MBSR certificada por el Global Mindfulness Collaborative (Brown University). Programas de 4 y 8 semanas, retiros, propuestas para empresas, testimonios y un reproductor de meditaciones guiadas. Entregado y en producción con dominio propio.",
-  url: "https://www.mindfulnessbuenosaires.com/",
-  cta: "Visitar sitio oficial",
-  image: "/mindfulness-real.png",
-  tags: ["Next.js", "Tailwind", "Lenis"],
-};
-
-const beylhe: Project = {
-  name: "Beylhe",
-  status: "Vendida y entregada",
-  statusTone: "amber",
-  description:
-    "Sitio web de exhibición y e-commerce desarrollado a medida para Beylhe, una artista dedicada al diseño y venta de cuadros y obras de arte visual. Proyecto entregado de forma exitosa a cliente final.",
-  url: "https://beylhe.com.ar/",
-  cta: "Visitar sitio oficial",
-  image: "/beylhe-real.png",
-  tags: ["React", "Arte & Galería", "Tailwind"],
-};
-
-const enVenta: Project[] = [
-  {
-    name: "As Rey Dry Gin",
-    status: "En proceso de venta",
-    statusTone: "neutral",
-    description:
-      "El primer gin artesanal de Cutral-Có, Neuquén, galardonado con Medalla de Plata en la Copa Argentina de Destilados 2025. E-commerce premium con catálogo, carrito y pasarela de pago Mercado Pago.",
+const projectMeta: Record<ProjectId, { url: string; image: string; statusTone: "amber" | "neutral" }> = {
+  mindfulness: {
+    url: "https://www.mindfulnessbuenosaires.com/",
+    image: "/mindfulness-real.png",
+    statusTone: "amber",
+  },
+  beylhe: { url: "https://beylhe.com.ar/", image: "/beylhe-real.png", statusTone: "amber" },
+  asrey: {
     url: "https://asreydrygin.vercel.app/",
-    cta: "Ver demo",
     image: "/asrey-real.png",
-    tags: ["Next.js", "MercadoPago", "Tailwind"],
-  },
-  {
-    name: "Esteko Ingeniería",
-    status: "En proceso de venta",
     statusTone: "neutral",
-    description:
-      "Web corporativa para consultoría civil y cálculo estructural. Muestra portafolios técnicos, detalles de ingeniería, modelado BIM avanzado y fotogrametría industrial.",
+  },
+  esteko: {
     url: "https://esteko-web.vercel.app/",
-    cta: "Ver demo",
     image: "/esteko-real.png",
-    tags: ["Next.js", "Ingeniería", "Interactive SVG"],
-  },
-];
-
-const enProduccion: Project[] = [
-  {
-    name: "Enbox Gym",
-    status: "Fitness & Box",
     statusTone: "neutral",
-    description:
-      "Landing page interactiva para centro de entrenamiento funcional y boxeo en Cutral-Có. Diseñada para potenciar conversiones con grillas de horarios interactivos, planes y registro rápido.",
+  },
+  enbox: {
     url: "https://enbox-gym.vercel.app/",
-    cta: "Ver sitio",
     image: "/enbox-real.png",
-    tags: ["React", "Vite", "Framer Motion"],
-  },
-  {
-    name: "Crecer Inmobiliaria",
-    status: "Portal inmobiliario",
     statusTone: "neutral",
-    description:
-      "Plataforma web con catálogo para Crecer Hub Inmobiliario, con trayectoria desde 1982. Incluye buscador dinámico, filtros por zona y precio, y contacto directo por propiedades.",
-    url: "https://crecer-inmobiliaria.vercel.app/",
-    cta: "Ver sitio",
-    image: "/crecer-real.png",
-    tags: ["React", "Buscador", "Tailwind CSS"],
   },
-];
+  crecer: {
+    url: "https://crecer-inmobiliaria.vercel.app/",
+    image: "/crecer-real.png",
+    statusTone: "neutral",
+  },
+};
+
+function buildProject(t: Dictionary, id: ProjectId): Project {
+  return { id, ...projectMeta[id], ...t.projects.items[id] };
+}
+
+type VideoId = "featured" | "memoria" | "volver" | "mia" | "lean";
 
 type VideoProject = {
+  id: VideoId;
   title: string;
   artist: string;
   role: string;
@@ -103,63 +70,22 @@ type VideoProject = {
   tags: string[];
 };
 
-const featuredVideo: VideoProject = {
-  title: "Más fotos",
-  artist: "ivi",
-  role: "Videoclip oficial",
-  description:
-    "Videoclip oficial de «Más fotos» del artista ivi. Me encargué de la grabación y del montaje completo: selección de tomas, ritmo de corte al pulso de la canción, corrección de color y armado final del video.",
-  youtubeId: "J5cNz_XGaoM",
-  tags: ["Grabación", "Edición", "Color"],
+const videoMeta: Record<VideoId, { artist: string; youtubeId: string }> = {
+  featured: { artist: "ivi", youtubeId: "J5cNz_XGaoM" },
+  memoria: { artist: "LEAN", youtubeId: "XEq4gbAGzP4" },
+  volver: { artist: "LEAN", youtubeId: "BuTR1tqo3rY" },
+  mia: { artist: "LEAN", youtubeId: "AbYnKe0d10A" },
+  lean: { artist: "LEAN", youtubeId: "R625T2VWBiI" },
 };
 
-const videoclips: VideoProject[] = [
-  {
-    title: "siempre en tu memoria",
-    artist: "LEAN",
-    role: "Videoclip",
-    description:
-      "Videoclip grabado por Zoe Navarro y editado por mí de principio a fin: montaje, ritmo de corte y corrección de color para acompañar el tono del tema.",
-    youtubeId: "XEq4gbAGzP4",
-    tags: ["Edición", "Montaje", "Color"],
-  },
-  {
-    title: "CUANDO NOS VOLVAMOS A VER",
-    artist: "LEAN",
-    role: "Videoclip",
-    description:
-      "Grabación de Zoe Navarro con edición y post-producción a mi cargo. Sincronización con la letra, transiciones y gradación de color del videoclip.",
-    youtubeId: "BuTR1tqo3rY",
-    tags: ["Edición", "Transiciones", "Color"],
-  },
-  {
-    title: "QUIERO HACERTE MIA",
-    artist: "LEAN",
-    role: "Videoclip",
-    description:
-      "Videoclip filmado por Zoe Navarro y montado por mí. Selección de tomas, corte al ritmo del beat y ajuste de color para un acabado limpio y consistente.",
-    youtubeId: "AbYnKe0d10A",
-    tags: ["Edición", "Ritmo", "Color"],
-  },
-  {
-    title: "LEAN",
-    artist: "LEAN",
-    role: "Videoclip",
-    description:
-      "Otro videoclip del proyecto grabado por Zoe Navarro y editado íntegramente por mí, cuidando el ritmo de corte y la estética general del video.",
-    youtubeId: "R625T2VWBiI",
-    tags: ["Edición", "Montaje", "Color"],
-  },
-];
+function buildVideo(t: Dictionary, id: VideoId): VideoProject {
+  return { id, ...videoMeta[id], ...t.projects.videos[id] };
+}
 
-const musicdyContent = {
+const musicdyContentMeta = {
   brand: "Musicdy",
   handle: "@musicdy.app",
-  role: "Recién arrancando",
-  description:
-    "Todo el contenido de Musicdy lo hago yo: la edición creativa, el marketing y la publicación. La startup recién está arrancando con el contenido, así que estoy armando desde cero la identidad audiovisual de la marca.",
   url: "https://www.instagram.com/musicdy.app/",
-  tags: ["Edición creativa", "Marketing", "Contenido", "Marca"],
 };
 
 function StatusPill({ status, tone }: { status: string; tone: Project["statusTone"] }) {
@@ -200,7 +126,15 @@ function Reveal({
   );
 }
 
-function ProjectCard({ project, priority = false }: { project: Project; priority?: boolean }) {
+function ProjectCard({
+  project,
+  hoverLabel,
+  priority = false,
+}: {
+  project: Project;
+  hoverLabel: string;
+  priority?: boolean;
+}) {
   return (
     <article className="group flex h-full flex-col justify-between overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-900/40 transition-all duration-300 hover:border-neutral-600">
       <div>
@@ -212,7 +146,7 @@ function ProjectCard({ project, priority = false }: { project: Project; priority
         >
           <Image
             src={project.image}
-            alt={`Captura real de ${project.name}`}
+            alt={`${project.name}`}
             fill
             priority={priority}
             className="object-cover object-top transition-transform duration-500 group-hover:scale-[1.04]"
@@ -220,7 +154,7 @@ function ProjectCard({ project, priority = false }: { project: Project; priority
           />
           <div className="absolute inset-0 flex items-center justify-center bg-neutral-950/50 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-neutral-700 bg-neutral-950/90 px-3 py-1.5 font-heading text-xs font-semibold text-white">
-              <ExternalLink className="h-3.5 w-3.5" /> Abrir sitio
+              <ExternalLink className="h-3.5 w-3.5" /> {hoverLabel}
             </span>
           </div>
         </a>
@@ -256,7 +190,7 @@ function ProjectCard({ project, priority = false }: { project: Project; priority
   );
 }
 
-function FeaturedCard({ project }: { project: Project }) {
+function FeaturedCard({ project, hoverLabel }: { project: Project; hoverLabel: string }) {
   return (
     <Reveal>
       <article className="group overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-900/40 transition-all duration-300 hover:border-neutral-600 lg:grid lg:grid-cols-[1.1fr_1fr]">
@@ -268,7 +202,7 @@ function FeaturedCard({ project }: { project: Project }) {
         >
           <Image
             src={project.image}
-            alt={`Captura real de ${project.name}`}
+            alt={`${project.name}`}
             fill
             priority
             className="object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
@@ -276,7 +210,7 @@ function FeaturedCard({ project }: { project: Project }) {
           />
           <div className="absolute inset-0 flex items-center justify-center bg-neutral-950/50 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-neutral-700 bg-neutral-950/90 px-3 py-1.5 font-heading text-xs font-semibold text-white">
-              <ExternalLink className="h-3.5 w-3.5" /> Abrir sitio
+              <ExternalLink className="h-3.5 w-3.5" /> {hoverLabel}
             </span>
           </div>
         </a>
@@ -314,12 +248,12 @@ function FeaturedCard({ project }: { project: Project }) {
   );
 }
 
-function CardGrid({ projects }: { projects: Project[] }) {
+function CardGrid({ projects, hoverLabel }: { projects: Project[]; hoverLabel: string }) {
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
       {projects.map((project, i) => (
-        <Reveal key={project.name} delay={i * 0.08}>
-          <ProjectCard project={project} />
+        <Reveal key={project.id} delay={i * 0.08}>
+          <ProjectCard project={project} hoverLabel={hoverLabel} />
         </Reveal>
       ))}
     </div>
@@ -347,7 +281,7 @@ function PlayOverlay() {
   );
 }
 
-function VideoCard({ video }: { video: VideoProject }) {
+function VideoCard({ video, verEnYoutube }: { video: VideoProject; verEnYoutube: string }) {
   return (
     <article className="group flex h-full flex-col justify-between overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-900/40 transition-all duration-300 hover:border-neutral-600">
       <div>
@@ -359,7 +293,7 @@ function VideoCard({ video }: { video: VideoProject }) {
         >
           <Image
             src={thumb(video.youtubeId)}
-            alt={`Miniatura del videoclip ${video.title} de ${video.artist}`}
+            alt={`${video.title} — ${video.artist}`}
             fill
             className="scale-[1.35] object-cover transition-transform duration-500 group-hover:scale-[1.42]"
             sizes="(max-width: 768px) 100vw, 420px"
@@ -396,14 +330,14 @@ function VideoCard({ video }: { video: VideoProject }) {
           rel="noopener noreferrer"
           className="inline-flex shrink-0 items-center gap-1.5 font-heading text-xs font-semibold text-neutral-200 transition-colors hover:text-amber-300"
         >
-          Ver en YouTube <ExternalLink className="h-3.5 w-3.5" />
+          {verEnYoutube} <ExternalLink className="h-3.5 w-3.5" />
         </a>
       </div>
     </article>
   );
 }
 
-function FeaturedVideoCard({ video }: { video: VideoProject }) {
+function FeaturedVideoCard({ video, verVideoclip }: { video: VideoProject; verVideoclip: string }) {
   return (
     <Reveal>
       <article className="group overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-900/40 transition-all duration-300 hover:border-neutral-600 lg:grid lg:grid-cols-[1.1fr_1fr]">
@@ -415,7 +349,7 @@ function FeaturedVideoCard({ video }: { video: VideoProject }) {
         >
           <Image
             src={thumb(video.youtubeId)}
-            alt={`Miniatura del videoclip ${video.title} de ${video.artist}`}
+            alt={`${video.title} — ${video.artist}`}
             fill
             priority
             className="scale-[1.35] object-cover transition-transform duration-500 group-hover:scale-[1.4]"
@@ -454,7 +388,7 @@ function FeaturedVideoCard({ video }: { video: VideoProject }) {
             rel="noopener noreferrer"
             className="mt-1 inline-flex w-fit items-center gap-2 rounded-full border border-neutral-700 px-5 py-2.5 font-heading text-xs font-semibold text-neutral-100 transition-all duration-300 hover:border-neutral-500 hover:text-white active:scale-[0.98]"
           >
-            Ver videoclip <ExternalLink className="h-3.5 w-3.5" />
+            {verVideoclip} <ExternalLink className="h-3.5 w-3.5" />
           </a>
         </div>
       </article>
@@ -462,20 +396,20 @@ function FeaturedVideoCard({ video }: { video: VideoProject }) {
   );
 }
 
-function VideoGrid({ videos }: { videos: VideoProject[] }) {
+function VideoGrid({ videos, verEnYoutube }: { videos: VideoProject[]; verEnYoutube: string }) {
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
       {videos.map((video, i) => (
-        <Reveal key={video.youtubeId} delay={i * 0.08}>
-          <VideoCard video={video} />
+        <Reveal key={video.id} delay={i * 0.08}>
+          <VideoCard video={video} verEnYoutube={verEnYoutube} />
         </Reveal>
       ))}
     </div>
   );
 }
 
-function BrandContentCard() {
-  const c = musicdyContent;
+function BrandContentCard({ t }: { t: Dictionary }) {
+  const c = { ...musicdyContentMeta, ...t.projects.musicdyContent };
   return (
     <Reveal>
       <article className="group overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-900/40 transition-all duration-300 hover:border-neutral-600 lg:grid lg:grid-cols-[1.1fr_1fr]">
@@ -483,7 +417,7 @@ function BrandContentCard() {
           href={c.url}
           target="_blank"
           rel="noopener noreferrer"
-          aria-label={`Abrir el Instagram de ${c.brand}`}
+          aria-label={`${c.brand} — Instagram`}
           className="relative flex aspect-video w-full items-center justify-center overflow-hidden border-b border-neutral-800/80 bg-neutral-950 lg:h-full lg:min-h-[360px] lg:border-b-0 lg:border-r"
         >
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(251,191,36,0.12),transparent_65%)]" />
@@ -495,7 +429,7 @@ function BrandContentCard() {
               {c.handle}
             </span>
             <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-neutral-500">
-              Contenido en construcción
+              {c.contentInProgress}
             </span>
           </div>
         </a>
@@ -523,7 +457,7 @@ function BrandContentCard() {
             rel="noopener noreferrer"
             className="mt-1 inline-flex w-fit items-center gap-2 rounded-full border border-neutral-700 px-5 py-2.5 font-heading text-xs font-semibold text-neutral-100 transition-all duration-300 hover:border-neutral-500 hover:text-white active:scale-[0.98]"
           >
-            Ver en Instagram <ExternalLink className="h-3.5 w-3.5" />
+            {c.cta} <ExternalLink className="h-3.5 w-3.5" />
           </a>
         </div>
       </article>
@@ -533,12 +467,20 @@ function BrandContentCard() {
 
 type Tab = "sitios" | "video";
 
-const tabs: { id: Tab; label: string; icon: React.ElementType }[] = [
-  { id: "sitios", label: "Sitios web", icon: Globe },
-  { id: "video", label: "Edición de video", icon: Clapperboard },
-];
+function TabSwitch({
+  tab,
+  setTab,
+  t,
+}: {
+  tab: Tab;
+  setTab: (t: Tab) => void;
+  t: Dictionary;
+}) {
+  const tabs: { id: Tab; label: string; icon: React.ElementType }[] = [
+    { id: "sitios", label: t.projects.tabs.sitios, icon: Globe },
+    { id: "video", label: t.projects.tabs.video, icon: Clapperboard },
+  ];
 
-function TabSwitch({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {
   return (
     <div className="mt-8 inline-flex items-center gap-1 rounded-full border border-neutral-800 bg-neutral-900/60 p-1">
       {tabs.map(({ id, label, icon: Icon }) => {
@@ -572,26 +514,52 @@ function TabSwitch({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {
 }
 
 export function Projects() {
+  const { t } = useLanguage();
   const [tab, setTab] = useState<Tab>("sitios");
+
+  const mindfulness = buildProject(t, "mindfulness");
+  const beylhe = buildProject(t, "beylhe");
+  const enVenta = [buildProject(t, "asrey"), buildProject(t, "esteko")];
+  const enProduccion = [buildProject(t, "enbox"), buildProject(t, "crecer")];
+
+  const featuredVideo = buildVideo(t, "featured");
+  const videoclips = (["memoria", "volver", "mia", "lean"] as const).map((id) => buildVideo(t, id));
+
+  const hoverLabel = t.projects.hoverOpenSite;
 
   const sitiosData = [
     {
-      title: "Entregados",
+      title: t.projects.groups.entregados,
       content: (
         <div className="space-y-6">
-          <FeaturedCard project={mindfulnessBA} />
-          <FeaturedCard project={beylhe} />
+          <FeaturedCard project={mindfulness} hoverLabel={hoverLabel} />
+          <FeaturedCard project={beylhe} hoverLabel={hoverLabel} />
         </div>
       ),
     },
-    { title: "En venta", content: <CardGrid projects={enVenta} /> },
-    { title: "En producción", content: <CardGrid projects={enProduccion} /> },
+    {
+      title: t.projects.groups.enVenta,
+      content: <CardGrid projects={enVenta} hoverLabel={hoverLabel} />,
+    },
+    {
+      title: t.projects.groups.enProduccion,
+      content: <CardGrid projects={enProduccion} hoverLabel={hoverLabel} />,
+    },
   ];
 
   const videoData = [
-    { title: "Destacado", content: <FeaturedVideoCard video={featuredVideo} /> },
-    { title: "Videoclips", content: <VideoGrid videos={videoclips} /> },
-    { title: "Contenido de marca", content: <BrandContentCard /> },
+    {
+      title: t.projects.groups.destacado,
+      content: <FeaturedVideoCard video={featuredVideo} verVideoclip={t.projects.videos.verVideoclip} />,
+    },
+    {
+      title: t.projects.groups.videoclips,
+      content: <VideoGrid videos={videoclips} verEnYoutube={t.projects.videos.verEnYoutube} />,
+    },
+    {
+      title: t.projects.groups.contenidoMarca,
+      content: <BrandContentCard t={t} />,
+    },
   ];
 
   const isSitios = tab === "sitios";
@@ -600,13 +568,11 @@ export function Projects() {
     <section id="proyectos" className="scroll-mt-16">
       <Timeline
         data={isSitios ? sitiosData : videoData}
-        title={isSitios ? "Sitios en producción" : "Edición de video"}
+        title={isSitios ? t.projects.timeline.sitiosTitle : t.projects.timeline.videoTitle}
         description={
-          isSitios
-            ? "Una cronología interactiva de los sitios que diseñé y desplegué a medida sobre la infraestructura de Vercel."
-            : "Videoclips musicales grabados junto a Zoe Navarro y editados por mí, más todo el contenido audiovisual de Musicdy: edición creativa, marketing y marca."
+          isSitios ? t.projects.timeline.sitiosDescription : t.projects.timeline.videoDescription
         }
-        headerExtra={<TabSwitch tab={tab} setTab={setTab} />}
+        headerExtra={<TabSwitch tab={tab} setTab={setTab} t={t} />}
       />
     </section>
   );

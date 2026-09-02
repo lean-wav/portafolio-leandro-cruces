@@ -15,10 +15,25 @@ import {
   UsersRound,
   X,
 } from "lucide-react";
+import { useLanguage } from "@/lib/i18n/language-provider";
+import type { Dictionary } from "@/lib/i18n/dictionaries";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
+const capabilityIds = ["player", "explore", "studio", "profile"] as const;
+type CapabilityId = (typeof capabilityIds)[number];
+
+const capabilityMeta: Record<CapabilityId, { icon: React.ElementType; image: string }> = {
+  player: { icon: Disc3, image: "/musicdy-app-inicio.png" },
+  explore: { icon: AudioWaveform, image: "/musicdy-app-explorar.png" },
+  studio: { icon: Layers, image: "/musicdy-app-estudio.png" },
+  profile: { icon: UsersRound, image: "/musicdy-app-perfil.png" },
+};
+
+const factIds = ["platform", "payments", "model", "backend"] as const;
+
 type Capability = {
+  id: CapabilityId;
   icon: React.ElementType;
   title: string;
   description: string;
@@ -26,47 +41,13 @@ type Capability = {
   image: string;
 };
 
-const capabilities: Capability[] = [
-  {
-    icon: Disc3,
-    title: "Reproductor y licencias",
-    description:
-      "Al entrar, un carrusel 3D de beats con reproductor integrado. Cada track muestra el productor y su precio, con la compra de licencia a un clic dentro de la app.",
-    chips: ["Carrusel 3D", "Reproductor", "Comprar licencia"],
-    image: "/musicdy-app-inicio.png",
-  },
-  {
-    icon: AudioWaveform,
-    title: "Explorar y descubrir",
-    description:
-      "Biblioteca personal con playlists, productores en tendencia y colecciones de la comunidad. Búsqueda por título, productor o BPM y filtros por género.",
-    chips: ["Biblioteca", "Tendencias", "Colecciones"],
-    image: "/musicdy-app-explorar.png",
-  },
-  {
-    icon: Layers,
-    title: "Studio de publicación",
-    description:
-      "Flujo guiado en pasos para publicar un beat, un sample/loop o una canción: se sube el archivo original y la portada, y se definen las licencias y los splits.",
-    chips: ["Subir beats", "Portada", "Licencias y splits"],
-    image: "/musicdy-app-estudio.png",
-  },
-  {
-    icon: UsersRound,
-    title: "Perfil de artista",
-    description:
-      "Perfil público con seguidores, colaboraciones, compras, billetera y estadísticas, más enlaces a Instagram y Spotify. Todo lo que necesita un productor para crecer.",
-    chips: ["Seguidores", "Billetera", "Estadísticas"],
-    image: "/musicdy-app-perfil.png",
-  },
-];
-
-const facts = [
-  { label: "Plataforma", value: "Web + App móvil" },
-  { label: "Pagos integrados", value: "Stripe y Mercado Pago" },
-  { label: "Modelo", value: "Licencias de beats" },
-  { label: "Backend", value: "FastAPI + Supabase" },
-];
+function buildCapabilities(t: Dictionary): Capability[] {
+  return capabilityIds.map((id) => ({
+    id,
+    ...capabilityMeta[id],
+    ...t.musicdy.capabilities[id],
+  }));
+}
 
 const stack = [
   "Next.js",
@@ -102,10 +83,12 @@ function CardStack({
   items,
   active,
   onExpand,
+  t,
 }: {
   items: Capability[];
   active: number;
   onExpand: () => void;
+  t: Dictionary;
 }) {
   const reduce = useReducedMotion();
   const n = items.length;
@@ -120,11 +103,11 @@ function CardStack({
         return (
           <motion.button
             type="button"
-            key={cap.title}
+            key={cap.id}
             onClick={front ? onExpand : undefined}
             tabIndex={front ? 0 : -1}
             aria-hidden={!front}
-            aria-label={`Ampliar captura: ${cap.title}`}
+            aria-label={`${t.musicdy.lightbox.expandLabel} ${cap.title}`}
             className={`group absolute inset-0 overflow-hidden rounded-2xl border border-white/10 bg-neutral-950 shadow-[0_24px_80px_rgba(0,0,0,0.5)] ${
               front ? "cursor-pointer" : "pointer-events-none"
             }`}
@@ -138,7 +121,7 @@ function CardStack({
           >
             <Image
               src={cap.image}
-              alt={`Captura real de Musicdy: ${cap.title}`}
+              alt={`${t.musicdy.lightbox.realScreenshotOf} ${cap.title}`}
               fill
               priority={front}
               className="object-cover object-top"
@@ -148,7 +131,7 @@ function CardStack({
               <>
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-neutral-950/70 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                 <div className="pointer-events-none absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-neutral-950/80 px-3 py-1.5 font-heading text-xs font-semibold text-white opacity-0 backdrop-blur transition-opacity duration-300 group-hover:opacity-100">
-                  <Expand className="h-3.5 w-3.5" /> Ampliar
+                  <Expand className="h-3.5 w-3.5" /> {t.musicdy.expandWord}
                 </div>
               </>
             )}
@@ -164,11 +147,13 @@ function Lightbox({
   index,
   setIndex,
   onClose,
+  t,
 }: {
   items: Capability[];
   index: number;
   setIndex: (i: number) => void;
   onClose: () => void;
+  t: Dictionary;
 }) {
   const reduce = useReducedMotion();
   const n = items.length;
@@ -198,7 +183,7 @@ function Lightbox({
     <motion.div
       role="dialog"
       aria-modal="true"
-      aria-label={`Captura de Musicdy: ${cap.title}`}
+      aria-label={`${t.musicdy.lightbox.screenshotOf} ${cap.title}`}
       className="fixed inset-0 z-[80] flex items-center justify-center bg-neutral-950/92 p-4 backdrop-blur-md md:p-8"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -228,7 +213,7 @@ function Lightbox({
             ref={closeRef}
             type="button"
             onClick={onClose}
-            aria-label="Cerrar"
+            aria-label={t.musicdy.lightbox.close}
             className="flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full border border-neutral-700 bg-neutral-900 text-neutral-300 transition-colors hover:border-neutral-500 hover:text-white"
           >
             <X className="h-5 w-5" />
@@ -246,7 +231,7 @@ function Lightbox({
             >
               <Image
                 src={cap.image}
-                alt={`Captura real de Musicdy: ${cap.title}`}
+                alt={`${t.musicdy.lightbox.realScreenshotOf} ${cap.title}`}
                 width={1264}
                 height={569}
                 className="h-auto w-full"
@@ -259,7 +244,7 @@ function Lightbox({
           <button
             type="button"
             onClick={() => go(-1)}
-            aria-label="Captura anterior"
+            aria-label={t.musicdy.lightbox.previous}
             className="absolute left-3 top-1/2 flex size-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-white/15 bg-neutral-950/80 text-white backdrop-blur transition-colors hover:border-amber-300/50 hover:text-amber-300"
           >
             <ChevronLeft className="h-5 w-5" />
@@ -267,7 +252,7 @@ function Lightbox({
           <button
             type="button"
             onClick={() => go(1)}
-            aria-label="Captura siguiente"
+            aria-label={t.musicdy.lightbox.next}
             className="absolute right-3 top-1/2 flex size-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-white/15 bg-neutral-950/80 text-white backdrop-blur transition-colors hover:border-amber-300/50 hover:text-amber-300"
           >
             <ChevronRight className="h-5 w-5" />
@@ -278,10 +263,10 @@ function Lightbox({
           <div className="flex items-center gap-2">
             {items.map((item, i) => (
               <button
-                key={item.title}
+                key={item.id}
                 type="button"
                 onClick={() => setIndex(i)}
-                aria-label={`Ir a ${item.title}`}
+                aria-label={`${t.musicdy.lightbox.goTo} ${item.title}`}
                 className={`h-1.5 rounded-full transition-all duration-300 ${
                   i === index ? "w-6 bg-amber-400" : "w-1.5 bg-neutral-700 hover:bg-neutral-500"
                 }`}
@@ -294,7 +279,7 @@ function Lightbox({
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 font-heading text-xs font-semibold text-neutral-300 transition-colors hover:text-amber-300"
           >
-            Abrir en musicdy.com <ArrowUpRight className="h-3.5 w-3.5" />
+            {t.musicdy.lightbox.openOn} <ArrowUpRight className="h-3.5 w-3.5" />
           </a>
         </div>
       </div>
@@ -303,12 +288,15 @@ function Lightbox({
 }
 
 export function Musicdy() {
+  const { t } = useLanguage();
   const [active, setActive] = useState(0);
   const [expanded, setExpanded] = useState(false);
   const [mounted, setMounted] = useState(false);
   const reduce = useReducedMotion();
 
   useEffect(() => setMounted(true), []);
+
+  const capabilities = buildCapabilities(t);
 
   const listContainer = {
     hidden: {},
@@ -337,7 +325,7 @@ export function Musicdy() {
           className="max-w-2xl"
         >
           <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-300">
-            La startup
+            {t.musicdy.eyebrow}
           </p>
           <div className="mt-4 flex items-end gap-4">
             <h2 className="font-heading text-5xl font-bold leading-none tracking-tight text-white md:text-7xl">
@@ -346,10 +334,7 @@ export function Musicdy() {
             <Equalizer />
           </div>
           <p className="mt-6 text-base leading-relaxed text-neutral-300 md:text-lg">
-            Plataforma de streaming y marketplace de beats que estoy diseñando y
-            desarrollando. Los productores publican, los artistas escuchan y las
-            licencias se compran dentro de la app. Todas las capturas de abajo son
-            de la app real, ya con la sesión iniciada.
+            {t.musicdy.intro}
           </p>
         </motion.div>
 
@@ -361,14 +346,17 @@ export function Musicdy() {
           transition={{ duration: 0.9, delay: 0.1, ease: EASE }}
           className="mt-14 grid grid-cols-2 gap-x-8 gap-y-6 lg:grid-cols-4"
         >
-          {facts.map((fact) => (
-            <div key={fact.label} className="border-t border-neutral-800 pt-4">
-              <dt className="text-xs text-neutral-500">{fact.label}</dt>
-              <dd className="mt-1 font-heading text-sm font-bold text-white md:text-base">
-                {fact.value}
-              </dd>
-            </div>
-          ))}
+          {factIds.map((id) => {
+            const fact = t.musicdy.facts[id];
+            return (
+              <div key={id} className="border-t border-neutral-800 pt-4">
+                <dt className="text-xs text-neutral-500">{fact.label}</dt>
+                <dd className="mt-1 font-heading text-sm font-bold text-white md:text-base">
+                  {fact.value}
+                </dd>
+              </div>
+            );
+          })}
         </motion.dl>
 
         {/* Explorador interactivo de capacidades */}
@@ -387,7 +375,7 @@ export function Musicdy() {
                 return (
                   <motion.li
                     variants={listItem}
-                    key={cap.title}
+                    key={cap.id}
                     className="border-t border-neutral-800 last:border-b"
                   >
                     <button
@@ -456,7 +444,7 @@ export function Musicdy() {
                 rel="noopener noreferrer"
                 className="neon-cta inline-flex items-center gap-2 rounded-full bg-amber-400 px-6 py-3 font-heading text-sm font-semibold text-neutral-950 transition-all duration-300 hover:-translate-y-0.5 hover:bg-amber-300 active:scale-[0.98]"
               >
-                Visitar musicdy.com <ArrowUpRight className="h-4 w-4" />
+                {t.musicdy.visitCta} <ArrowUpRight className="h-4 w-4" />
               </a>
               <div className="flex flex-wrap gap-1.5">
                 {stack.map((tech) => (
@@ -479,13 +467,13 @@ export function Musicdy() {
             transition={{ duration: 0.9, ease: EASE }}
             className="flex flex-col items-center gap-4 lg:items-end"
           >
-            <CardStack items={capabilities} active={active} onExpand={() => setExpanded(true)} />
+            <CardStack items={capabilities} active={active} onExpand={() => setExpanded(true)} t={t} />
             <button
               type="button"
               onClick={() => setExpanded(true)}
               className="inline-flex cursor-pointer items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.15em] text-neutral-500 transition-colors hover:text-amber-300"
             >
-              <Expand className="h-3.5 w-3.5" /> Tocá una captura para ampliarla
+              <Expand className="h-3.5 w-3.5" /> {t.musicdy.tapToExpand}
             </button>
           </motion.div>
         </div>
@@ -500,6 +488,7 @@ export function Musicdy() {
                 index={active}
                 setIndex={setActive}
                 onClose={() => setExpanded(false)}
+                t={t}
               />
             )}
           </AnimatePresence>,

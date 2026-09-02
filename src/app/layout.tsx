@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { Inter, Space_Grotesk, Geist_Mono } from "next/font/google";
+import { LanguageProvider } from "@/lib/i18n/language-provider";
+import { dictionaries, defaultLocale, locales, type Locale } from "@/lib/i18n/dictionaries";
 import "./globals.css";
 
 const inter = Inter({
@@ -18,22 +21,33 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Leandro Cruces | Portafolio",
-  description: "Portafolio profesional de Leandro Cruces - Desarrollador y creador de experiencias web de calidad premium.",
-};
+async function resolveLocale(): Promise<Locale> {
+  const headerList = await headers();
+  const fromHeader = headerList.get("x-locale");
+  return locales.includes(fromHeader as Locale) ? (fromHeader as Locale) : defaultLocale;
+}
 
-export default function RootLayout({
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await resolveLocale();
+  const { title, description } = dictionaries[locale].metadata;
+  return { title, description };
+}
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await resolveLocale();
+
   return (
     <html
-      lang="es"
+      lang={locale}
       className={`${inter.variable} ${spaceGrotesk.variable} ${geistMono.variable} dark h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-neutral-950 text-neutral-50">{children}</body>
+      <body className="min-h-full flex flex-col bg-neutral-950 text-neutral-50">
+        <LanguageProvider initialLocale={locale}>{children}</LanguageProvider>
+      </body>
     </html>
   );
 }

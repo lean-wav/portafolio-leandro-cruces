@@ -3,32 +3,34 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowUpRight, Mail } from "lucide-react";
 import { GithubIcon, LinkedinIcon } from "@/components/ui/brand-icons";
+import { useLanguage } from "@/lib/i18n/language-provider";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
-const socials = [
-  {
-    label: "GitHub",
-    sub: "Ver mis repositorios",
-    href: "https://github.com/lean-wav",
-    Icon: GithubIcon,
-  },
-  {
-    label: "LinkedIn",
-    sub: "Conectemos",
-    href: "https://www.linkedin.com/in/leandro-cruces-59ab69257/",
-    Icon: LinkedinIcon,
-  },
-  {
-    label: "Correo",
-    sub: "leandrocruces12@gmail.com",
-    href: "mailto:leandrocruces12@gmail.com",
-    Icon: Mail,
-  },
-];
-
 export function SiteFooter() {
   const reduce = useReducedMotion();
+  const { t } = useLanguage();
+
+  const socials = [
+    {
+      label: t.footer.socials.github.label,
+      sub: t.footer.socials.github.sub,
+      href: "https://github.com/lean-wav",
+      Icon: GithubIcon,
+    },
+    {
+      label: t.footer.socials.linkedin.label,
+      sub: t.footer.socials.linkedin.sub,
+      href: "https://www.linkedin.com/in/leandro-cruces-59ab69257/",
+      Icon: LinkedinIcon,
+    },
+    {
+      label: t.footer.socials.email.label,
+      sub: "leandrocruces12@gmail.com",
+      href: "mailto:leandrocruces12@gmail.com",
+      Icon: Mail,
+    },
+  ];
 
   const container = {
     hidden: {},
@@ -58,22 +60,23 @@ export function SiteFooter() {
           variants={item}
           className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-300"
         >
-          Hablemos
+          {t.footer.eyebrow}
         </motion.p>
 
         <motion.h2
           variants={item}
           className="mt-4 max-w-3xl font-heading text-4xl font-bold leading-[1.05] tracking-tight text-white md:text-6xl"
         >
-          ¿Tenés un proyecto <span className="text-amber-300">en mente</span>?
+          {t.footer.headline.before}{" "}
+          <span className="text-amber-300">{t.footer.headline.highlight}</span>
+          {t.footer.headline.after}
         </motion.h2>
 
         <motion.p
           variants={item}
           className="mt-6 max-w-xl text-base leading-relaxed text-neutral-400 md:text-lg"
         >
-          Ya sea una web a medida, una tienda online o un producto desde cero,
-          escribime y lo hacemos realidad.
+          {t.footer.paragraph}
         </motion.p>
 
         <motion.div variants={item} className="mt-10">
@@ -81,7 +84,7 @@ export function SiteFooter() {
             href="mailto:leandrocruces12@gmail.com"
             className="neon-cta inline-flex items-center gap-2.5 rounded-full bg-amber-400 px-8 py-4 font-heading text-base font-semibold text-neutral-950 transition-all duration-300 hover:-translate-y-0.5 hover:bg-amber-300 active:scale-[0.98]"
           >
-            <Mail className="h-5 w-5" /> Escribime
+            <Mail className="h-5 w-5" /> {t.footer.cta}
           </a>
         </motion.div>
 
@@ -126,8 +129,7 @@ export function SiteFooter() {
             Leandro Cruces
           </p>
           <p className="text-xs text-neutral-600">
-            © {new Date().getFullYear()} Leandro Cruces. Todos los derechos
-            reservados.
+            © {new Date().getFullYear()} Leandro Cruces. {t.footer.rights}
           </p>
         </motion.div>
       </motion.div>
